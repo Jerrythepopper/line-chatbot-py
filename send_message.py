@@ -33,5 +33,5 @@ def send_message():
 
 # 檢查今天是否是每月20號，且現在時間是否是20點
 now = datetime.datetime.now()
-if now.day == 20 and now.hour == 20 and now.minute == 20:
+if now.day == 30 and now.hour == 23 and now.minute == 23:
     send_message()
