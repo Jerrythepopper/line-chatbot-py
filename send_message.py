@@ -3,7 +3,7 @@ import json
 import datetime
 
 # 設定你的 LINE Channel Access Token
-channel_access_token = 'YOUR_CHANNEL_ACCESS_TOKEN'
+channel_access_token = 'aHZO9J6wiqzt+81cxgoKWH5mn2qLnYV8uFul2c7ns/HSMwk4mUJ8JHNPUwr5jrW6Uo4CLbBwTzP0T/7y1APAHh0pi+C0dskGJQq77EqPpV8SPYUnI1CfYdmbUfupfparL1zUqjhR9M3bg318FAHOhwdB04t89/1O/w1cDnyilFU='
 
 # 設定推送訊息的 URL
 url = 'https://api.line.me/v2/bot/message/push'
