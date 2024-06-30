@@ -1,37 +1,32 @@
-import requests
-import json
-import datetime
+from flask import Flask, request, abort
+from linebot import LineBotApi, WebhookHandler
+from linebot.exceptions import InvalidSignatureError
+from linebot.models import *
+import os
 
-# 設定你的 LINE Channel Access Token
-channel_access_token = 'aHZO9J6wiqzt+81cxgoKWH5mn2qLnYV8uFul2c7ns/HSMwk4mUJ8JHNPUwr5jrW6Uo4CLbBwTzP0T/7y1APAHh0pi+C0dskGJQq77EqPpV8SPYUnI1CfYdmbUfupfparL1zUqjhR9M3bg318FAHOhwdB04t89/1O/w1cDnyilFU='
+app = Flask(__name__)
 
-# 設定推送訊息的 URL
-url = 'https://api.line.me/v2/bot/message/push'
+line_bot_api = LineBotApi(os.environ['CHANNEL_ACCESS_TOKEN'])
+handler = WebhookHandler(os.environ['CHANNEL_SECRET'])
 
-# 設定消息的接收者和消息內容
-headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {channel_access_token}'
-}
 
-# 準備訊息內容
-data = {
-    'to': 'YOUR_GROUP_ID',
-    'messages': [
-        {
-            'type': 'text',
-            'text': '@everyone 大家來約下個月何時吃飯!'
-        }
-    ]
-}
+@app.route("/callback", methods=['POST'])
+def callback():
+    signature = request.headers['X-Line-Signature']
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+    return 'OK'
 
-# 發送訊息的函數
-def send_message():
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-    print(response.status_code)
-    print(response.json())
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+    message = TextSendMessage(text=event.message.text)
+    line_bot_api.reply_message(event.reply_token, message)
 
-# 檢查今天是否是每月20號，且現在時間是否是20點
-now = datetime.datetime.now()
-if now.day == 30 and now.hour == 23 and now.minute == 23:
-    send_message()
+import os
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
